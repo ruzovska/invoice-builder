@@ -69,6 +69,18 @@ data Entry = Entry
     , isDone :: Bool
     } deriving (Show, Read)
 
+data Info = Info
+    { senderName :: Text
+    , senderAddress :: Text
+    , senderCity :: Text
+    , recipientName :: Text
+    , recipientAddress :: Text
+    , recipientCity :: Text
+    , payRate :: Double
+    , date :: Day
+    , serviceName :: Text
+    } deriving (Show, Read)
+
 data Ticket = Issue String Int | PullRequest String Int deriving (Show, Read)
 
 instance Texy Ticket where
