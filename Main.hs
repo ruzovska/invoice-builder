@@ -15,6 +15,7 @@ import qualified Data.Text as Text
 import Data.Time.Clock
 import Data.Time.Calendar
 import Data.Time.Format
+import System.Environment
 import Text.Pretty.Simple
 import Text.Read
 
@@ -30,17 +31,35 @@ import Text.Read
 --             makeHeader start end
 --             entriesToTable entries
 
+-- main :: IO ()
+-- main = do
+--     example <- getContents
+--     let Log {..} = read example :: Log
+--     Text.putStrLn $ (render :: LaTeX -> Text) $ execLaTeXM $ do
+--         documentclass [] article
+--         usepackage ["colorlinks=true"] hyperref
+--         usepackage [] tabularxp
+--         document $ do
+--             makeHeader2 start end
+--             entriesToTable entries
+
 main :: IO ()
 main = do
-    example <- getContents
-    let Log {..} = read example :: Log
-    Text.putStrLn $ (render :: LaTeX -> Text) $ execLaTeXM $ do
-        documentclass [] article
-        usepackage ["colorlinks=true"] hyperref
-        usepackage [] tabularxp
-        document $ do
-            makeHeader2 start end
-            entriesToTable entries
+    args <- getArgs
+    if length args == 0
+        then print "No arguments provided!"
+        else do log <- readFile (args !! 0)
+                info <- readFile (args !! 1)
+                let Log {..} = read log :: Log
+                let Info {..} = read info :: Info
+                Text.putStrLn $ (render :: LaTeX -> Text) $ execLaTeXM $ do
+                    documentclass [] article
+                    usepackage ["colorlinks=true"] hyperref
+                    usepackage [] tabularxp
+                    document $ do
+                        makeHeader2 start end
+                        entriesToTable entries
+
 
 defaultTimeFormat = "%h:%0M"
 
