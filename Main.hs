@@ -50,9 +50,10 @@ main = do
         then print "No arguments provided!"
         else do log <- readFile (args !! 0)
                 info <- readFile (args !! 1)
+                let timesheetFilePath = args !! 2
                 let Log {..} = read log :: Log
                 let Info {..} = read info :: Info
-                Text.putStrLn $ (render :: LaTeX -> Text) $ execLaTeXM $ do
+                writeFile timesheetFilePath $ Text.unpack $ (render :: LaTeX -> Text) $ execLaTeXM $ do
                     documentclass [] article
                     usepackage ["colorlinks=true"] hyperref
                     usepackage [] tabularxp
