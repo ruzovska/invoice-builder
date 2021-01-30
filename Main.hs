@@ -83,7 +83,8 @@ data Log = Log
     } deriving (Show, Read)
 
 data Entry = Entry
-    { description :: Text
+    { serviceName :: Text
+    , description :: Text
     , tickets :: [Ticket]
     , time :: NominalDiffTime
     , isDone :: Bool
@@ -98,7 +99,6 @@ data Info = Info
     , recipientCity :: Text
     , payRate :: Double
     , date :: Day
-    , serviceName :: Text
     } deriving (Show, Read)
 
 data Ticket = Issue String Int | PullRequest String Int deriving (Show, Read)
