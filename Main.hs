@@ -136,11 +136,11 @@ entriesToTable xs = tabularx (CustomMeasure textwidth) Nothing [NameColumn "X", 
     "Software development services"
         & "$10.00"
         -- & texy ((read :: String -> Double) . showFixed True . (/3600) . nominalDiffTimeToSeconds $ sum (fmap time xs))
-        & fromString (prettyPrintForFractional ((/3600) . nominalDiffTimeToSeconds $ sum (fmap time xs)))
+        & fromString (prettyStringForFractional ((/3600) . nominalDiffTimeToSeconds $ sum (fmap time xs)))
         & ""
         -- & texy ((sum (fmap time xs)) * 10) >> lnbk
         -- & texy (((read :: String -> Double) . showFixed True . (/3600) . nominalDiffTimeToSeconds $ sum (fmap time xs)) * 10) >> lnbk
-        & fromString (prettyPrintForFractional (10 * ((/3600) . nominalDiffTimeToSeconds $ sum (fmap time xs)))) >> lnbk
+        & fromString (prettyStringForFractional (10 * ((/3600) . nominalDiffTimeToSeconds $ sum (fmap time xs)))) >> lnbk
     hline
     "Total" & "" & "" & "" & texy (sum (fmap time xs)) >> lnbk
     hline
@@ -149,13 +149,13 @@ entryToRow :: Entry -> LaTeXM ()
 entryToRow Entry {..} = texy description & (if isDone then "completed" else "") & sequence_ (List.intersperse newline (fmap (mbox . texy) tickets)) & "" & texy time >> lnbk
 
 
--- prettyPrintForFractional :: Fractional a => a -> String
--- prettyPrintForFractional x = beforeDot ++ dropWhile (== '0') (reverse afterDot)
+-- prettyStringForFractional :: Fractional a => a -> String
+-- prettyStringForFractional x = beforeDot ++ dropWhile (== '0') (reverse afterDot)
 --     where beforeDot = take (dotIndex + 1) (show x)
 --           afterDot = drop (dotIndex + 1) (show x)
 --           dotIndex = fromJust (List.elemIndex '.' (show x))
 
--- prettyPrintForFractional x = if (head afterDotWithoutZeros == '0' || length afterDotWithoutZeros == 0)
+-- prettyStringForFractional x = if (head afterDotWithoutZeros == '0' || length afterDotWithoutZeros == 0)
 --     then (beforeDot ++ afterDotWithoutZeros)
 --     else (beforeDot ++ "." ++ afterDotWithoutZeros)
 --         where beforeDot = take dotIndex (show x)
@@ -163,7 +163,7 @@ entryToRow Entry {..} = texy description & (if isDone then "completed" else "") 
 --               dotIndex = fromJust (List.elemIndex '.' (show x))
 --               afterDotWithoutZeros = dropWhile (== '0') (reverse afterDot)
 
--- prettyPrintForFractional x = case afterDotWithoutZeros of
+-- prettyStringForFractional x = case afterDotWithoutZeros of
 --     ((length afterDotWithoutZeros) == 0) -> beforeDot ++ "." ++ afterDotWithoutZeros
 --     head afterDotWithoutZeros == '0' -> beforeDot ++ afterDotWithoutZeros
 --     xs -> beforeDot ++ "." ++ afterDotWithoutZeros
@@ -172,7 +172,7 @@ entryToRow Entry {..} = texy description & (if isDone then "completed" else "") 
 --               dotIndex = fromJust (List.elemIndex '.' (show x))
 --               afterDotWithoutZeros = dropWhile (== '0') (reverse afterDot)
 
-prettyPrintForFractional x
+prettyStringForFractional x
     | length afterDotWithoutZeros == 0 = beforeDot ++ afterDotWithoutZeros
     | head afterDotWithoutZeros == '0' = beforeDot ++ afterDotWithoutZeros
     | otherwise = beforeDot ++ "." ++ afterDotWithoutZeros
