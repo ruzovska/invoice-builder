@@ -1,0 +1,28 @@
+Log
+    { start = (2014-07-22)
+    , end = (2017-11-29)
+    , entries =
+        [ Entry
+            { rrate = 10
+            , serviceName = "Software development"
+            , description = "Planting"
+            , tickets =
+                [ PullRequest "githubtraining/hellogitworld" 1
+                , PullRequest "githubtraining/hellogitworld" 2
+                ]
+            , time = 3600s
+            , isDone = True
+            }
+        , Entry
+            { rrate = 10
+            , serviceName = "Software development"
+            , description = "Gathering"
+            , tickets =
+                [ Issue "githubtraining/hellogitworld" 132
+                , Issue "githubtraining/hellogitworld" 140
+                ]
+            , time = 5400s
+            , isDone = True
+            }
+        ]
+    }
