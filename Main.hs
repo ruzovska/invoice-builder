@@ -153,9 +153,11 @@ entriesToTable xs info = tabularx (CustomMeasure textwidth) Nothing [NameColumn 
 entryToRow :: Info -> Entry -> LaTeXM ()
 entryToRow info Entry {..} = texy serviceName
     & fromString (prettyStringForFractional (payRate info))
-    & fromString (prettyStringForFractional ((/3600) . nominalDiffTimeToSeconds $ time))
+    & fromString (prettyStringForFractional quantity)
     & ""
-    & fromString (prettyStringForFractional (realToFrac (payRate info) * ((/3600) . nominalDiffTimeToSeconds $ time))) >> lnbk
+    & fromString (prettyStringForFractional amount) >> lnbk
+        where quantity = (/3600) . nominalDiffTimeToSeconds $ time
+              amount = realToFrac (payRate info) * quantity
 
 -- prettyStringForFractional :: Fractional a => a -> String
 -- prettyStringForFractional x = beforeDot ++ dropWhile (== '0') (reverse afterDot)
