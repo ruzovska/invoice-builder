@@ -49,17 +49,18 @@ main = do
     if length args == 0
         then print "No arguments provided!"
         else do log <- readFile (args !! 0)
-                info <- readFile (args !! 1)
+                infoString <- readFile (args !! 1)
                 let timesheetFilePath = args !! 2
                 let Log {..} = read log :: Log
-                let Info {..} = read info :: Info
+                -- let Info {..} = read info :: Info
+                let info = read infoString :: Info
                 writeFile timesheetFilePath $ Text.unpack $ (render :: LaTeX -> Text) $ execLaTeXM $ do
                     documentclass [] article
                     usepackage ["colorlinks=true"] hyperref
                     usepackage [] tabularxp
                     document $ do
                         makeHeader2 start end
-                        entriesToTable entries
+                        entriesToTable entries info
 
 
 defaultTimeFormat = "%h:%0M"
@@ -83,7 +84,8 @@ data Log = Log
     } deriving (Show, Read)
 
 data Entry = Entry
-    { serviceName :: Text
+    { rrate :: Double
+    , serviceName :: Text
     , description :: Text
     , tickets :: [Ticket]
     , time :: NominalDiffTime
@@ -91,7 +93,8 @@ data Entry = Entry
     } deriving (Show, Read)
 
 data Info = Info
-    { senderName :: Text
+    { rate :: Double
+    , senderName :: Text
     , senderAddress :: Text
     , senderCity :: Text
     , recipientName :: Text
@@ -127,27 +130,34 @@ makeHeader2 start end = do
         texy end
         lnbkspc (Ex 2)
 
-entriesToTable :: [Entry] -> LaTeXM ()
-entriesToTable xs = tabularx (CustomMeasure textwidth) Nothing [NameColumn "X", CenterColumn, NameColumn "X", NameColumn "X", RightColumn] $ do
+-- entriesToTable :: [Entry] -> _ -> LaTeXM ()
+entriesToTable xs ys = tabularx (CustomMeasure textwidth) Nothing [NameColumn "X", CenterColumn, NameColumn "X", NameColumn "X", RightColumn] $ do
     hline
-    "Description" & "Rate" & "Quantity" & "" & "Amount" >> lnbk
+    -- "Service" & "Rate" & "Quantity" & "" & "Amount" >> lnbk
+    "Service" & "Rate" & "Quantity" & "" & "Amount" >> lnbk
     hline
-    -- sequence_ $ fmap entryToRow xs
-    "Software development services"
-        & "$10.00"
-        -- & texy ((read :: String -> Double) . showFixed True . (/3600) . nominalDiffTimeToSeconds $ sum (fmap time xs))
-        & fromString (prettyStringForFractional ((/3600) . nominalDiffTimeToSeconds $ sum (fmap time xs)))
-        & ""
-        -- & texy ((sum (fmap time xs)) * 10) >> lnbk
-        -- & texy (((read :: String -> Double) . showFixed True . (/3600) . nominalDiffTimeToSeconds $ sum (fmap time xs)) * 10) >> lnbk
-        & fromString (prettyStringForFractional (10 * ((/3600) . nominalDiffTimeToSeconds $ sum (fmap time xs)))) >> lnbk
+    sequence_ $ fmap entryToRow xs
+    -- "Software development services"
+    --     & "$10.00"
+    --     -- & texy ((read :: String -> Double) . showFixed True . (/3600) . nominalDiffTimeToSeconds $ sum (fmap time xs))
+    --     & fromString (prettyStringForFractional ((/3600) . nominalDiffTimeToSeconds $ sum (fmap time xs)))
+    --     & ""
+    --     -- & texy ((sum (fmap time xs)) * 10) >> lnbk
+    --     -- & texy (((read :: String -> Double) . showFixed True . (/3600) . nominalDiffTimeToSeconds $ sum (fmap time xs)) * 10) >> lnbk
+    --     & fromString (prettyStringForFractional (10 * ((/3600) . nominalDiffTimeToSeconds $ sum (fmap time xs)))) >> lnbk
     hline
     "Total" & "" & "" & "" & texy (sum (fmap time xs)) >> lnbk
     hline
 
-entryToRow :: Entry -> LaTeXM ()
-entryToRow Entry {..} = texy description & (if isDone then "completed" else "") & sequence_ (List.intersperse newline (fmap (mbox . texy) tickets)) & "" & texy time >> lnbk
+-- entryToRow :: Entry -> LaTeXM ()
+-- entryToRow Entry {..} = texy description & (if isDone then "completed" else "") & sequence_ (List.intersperse newline (fmap (mbox . texy) tickets)) & "" & texy time >> lnbk
 
+entryToRow :: Entry -> LaTeXM ()
+entryToRow Entry {..} = texy serviceName
+    & texy rrate
+    & fromString (prettyStringForFractional ((/3600) . nominalDiffTimeToSeconds $ time))
+    & ""
+    & "meow!" >> lnbk
 
 -- prettyStringForFractional :: Fractional a => a -> String
 -- prettyStringForFractional x = beforeDot ++ dropWhile (== '0') (reverse afterDot)
