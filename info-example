@@ -1,10 +1,10 @@
 Info
-    { date = (2021-02-01)
-    , senderName = "Kitty"
+    { senderName = "Kitty"
     , senderAddress = "Street"
     , senderCity = "City"
     , recipientName = "Company"
     , recipientAddress = "Street"
     , recipientCity = "City"
     , payRate = 10
+    , date = (2021-02-01)
     }

@@ -84,8 +84,7 @@ data Log = Log
     } deriving (Show, Read)
 
 data Entry = Entry
-    { rrate :: Double
-    , serviceName :: Text
+    { serviceName :: Text
     , description :: Text
     , tickets :: [Ticket]
     , time :: NominalDiffTime
@@ -93,8 +92,7 @@ data Entry = Entry
     } deriving (Show, Read)
 
 data Info = Info
-    { rate :: Double
-    , senderName :: Text
+    { senderName :: Text
     , senderAddress :: Text
     , senderCity :: Text
     , recipientName :: Text
@@ -131,12 +129,12 @@ makeHeader2 start end = do
         lnbkspc (Ex 2)
 
 -- entriesToTable :: [Entry] -> _ -> LaTeXM ()
-entriesToTable xs ys = tabularx (CustomMeasure textwidth) Nothing [NameColumn "X", CenterColumn, NameColumn "X", NameColumn "X", RightColumn] $ do
+entriesToTable xs info = tabularx (CustomMeasure textwidth) Nothing [NameColumn "X", CenterColumn, NameColumn "X", NameColumn "X", RightColumn] $ do
     hline
     -- "Service" & "Rate" & "Quantity" & "" & "Amount" >> lnbk
     "Service" & "Rate" & "Quantity" & "" & "Amount" >> lnbk
     hline
-    sequence_ $ fmap entryToRow xs
+    sequence_ $ fmap (entryToRow info) xs
     -- "Software development services"
     --     & "$10.00"
     --     -- & texy ((read :: String -> Double) . showFixed True . (/3600) . nominalDiffTimeToSeconds $ sum (fmap time xs))
@@ -152,12 +150,12 @@ entriesToTable xs ys = tabularx (CustomMeasure textwidth) Nothing [NameColumn "X
 -- entryToRow :: Entry -> LaTeXM ()
 -- entryToRow Entry {..} = texy description & (if isDone then "completed" else "") & sequence_ (List.intersperse newline (fmap (mbox . texy) tickets)) & "" & texy time >> lnbk
 
-entryToRow :: Entry -> LaTeXM ()
-entryToRow Entry {..} = texy serviceName
-    & texy rrate
+entryToRow :: Info -> Entry -> LaTeXM ()
+entryToRow info Entry {..} = texy serviceName
+    & fromString (prettyStringForFractional (payRate info))
     & fromString (prettyStringForFractional ((/3600) . nominalDiffTimeToSeconds $ time))
     & ""
-    & "meow!" >> lnbk
+    & fromString (prettyStringForFractional (realToFrac (payRate info) * ((/3600) . nominalDiffTimeToSeconds $ time))) >> lnbk
 
 -- prettyStringForFractional :: Fractional a => a -> String
 -- prettyStringForFractional x = beforeDot ++ dropWhile (== '0') (reverse afterDot)
