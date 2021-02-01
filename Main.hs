@@ -85,6 +85,16 @@ mergeTwoEntriesByServiceName entry1 entry2 = entry2 {time = time entry1 + time e
 mergeEntriesByServiceName :: [Entry] -> Entry
 mergeEntriesByServiceName entries = (head entries) {time = sum (fmap time entries)}
 
+groupSimilarEntries :: [Entry] -> [[Entry]]
+groupSimilarEntries entries = List.groupBy (\x y -> serviceName x == serviceName y) entries
+
+groupSimilarEntriesSorted :: [Entry] -> [[Entry]]
+groupSimilarEntriesSorted entries =
+    List.groupBy (\x y -> serviceName x == serviceName y) (List.sortBy (\ x y -> compare (serviceName x) (serviceName y)) entries)
+
+superMerge :: [[Entry]] -> [Entry]
+superMerge xss = fmap (\entries -> let entry = head entries in entry {time = sum (fmap time entries)}) xss
+
 data Info = Info
     { senderName :: Text
     , senderAddress :: Text
@@ -125,7 +135,6 @@ makeHeader2 start end = do
 entriesToTable :: [Entry] -> Info -> LaTeXM ()
 entriesToTable xs info = tabularx (CustomMeasure textwidth) Nothing [NameColumn "X", CenterColumn, NameColumn "X", NameColumn "X", RightColumn] $ do
     hline
-    -- "Service" & "Rate" & "Quantity" & "" & "Amount" >> lnbk
     "Service" & "Rate" & "Quantity" & "" & "Amount" >> lnbk
     hline
     -- version with `mergeEntriesByServiceName`
