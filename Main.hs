@@ -19,18 +19,6 @@ import System.Environment
 import Text.Pretty.Simple
 import Text.Read
 
--- main :: IO ()
--- main = do
---     example <- getContents
---     let Log {..} = read example :: Log
---     Text.putStrLn $ (render :: LaTeX -> Text) $ execLaTeXM $ do
---         documentclass [] article
---         usepackage ["colorlinks=true"] hyperref
---         usepackage [] tabularxp
---         document $ do
---             makeHeader start end
---             entriesToTable entries
-
 main :: IO ()
 main = do
     args <- getArgs
@@ -47,7 +35,7 @@ main = do
                     usepackage ["colorlinks=true"] hyperref
                     usepackage [] tabularxp
                     document $ do
-                        makeHeader2 start end
+                        makeHeader start end
                         entriesToTable entries info
 
 
@@ -117,15 +105,6 @@ instance Texy Ticket where
 makeHeader :: Day -> Day -> LaTeXM ()
 makeHeader start end = do
     textbf $ do
-        "Time Sheet for "
-        texy start
-        "---"
-        texy end
-        lnbkspc (Ex 2)
-
-makeHeader2 :: Day -> Day -> LaTeXM ()
-makeHeader2 start end = do
-    textbf $ do
         "Invoice for "
         texy start
         "---"
@@ -137,42 +116,10 @@ entriesToTable xs info = tabularx (CustomMeasure textwidth) Nothing [NameColumn 
     hline
     "Service" & "Rate" & "Quantity" & "" & "Amount" >> lnbk
     hline
-    -- version with `mergeEntriesByServiceName`
-    texy (serviceName (mergeEntriesByServiceName xs))
-        & fromString (prettyStringForFractional (payRate info))
-        & fromString (prettyStringForFractional ((/3600) . nominalDiffTimeToSeconds $ time (mergeEntriesByServiceName xs)))
-        & ""
-        & fromString (prettyStringForFractional ((/3600) . nominalDiffTimeToSeconds $ time (mergeEntriesByServiceName xs))) >> lnbk
-    -- version where all entries are just printed without merging ones with the same `serviceName`
-    -- sequence_ $ fmap (entryToRow info) xs
+    sequence_ $ fmap (entryToRow info) (superMerge . groupSimilarEntriesSorted $ xs)
     hline
     "Total" & "" & "" & "" & texy (sum (fmap time xs)) >> lnbk
     hline
-
--- this one is empty so it works
--- entriesToTable :: [Entry] -> Info -> LaTeXM ()
--- entriesToTable xs info = tabularx (CustomMeasure textwidth) Nothing [NameColumn "X", CenterColumn, NameColumn "X", NameColumn "X", RightColumn] $ do
---     hline
---     -- "Service" & "Rate" & "Quantity" & "" & "Amount" >> lnbk
---     "Service" & "Rate" & "Quantity" & "" & "Amount" >> lnbk
---     hline
---     texy (serviceName (mergeEntriesByServiceName xs))
---         & ""
---         & ""
---         & ""
---         & fromString (prettyStringForFractional (time (mergeEntriesByServiceName xs))) >> lnbk
---     -- sequence_ $ fmap (entryToRow info) xs
---     -- "Software development services"
---     --     & "$10.00"
---     --     -- & texy ((read :: String -> Double) . showFixed True . (/3600) . nominalDiffTimeToSeconds $ sum (fmap time xs))
---     --     & fromString (prettyStringForFractional ((/3600) . nominalDiffTimeToSeconds $ sum (fmap time xs)))
---     --     & ""
---     --     -- & texy ((sum (fmap time xs)) * 10) >> lnbk
---     --     -- & texy (((read :: String -> Double) . showFixed True . (/3600) . nominalDiffTimeToSeconds $ sum (fmap time xs)) * 10) >> lnbk
---     --     & fromString (prettyStringForFractional (10 * ((/3600) . nominalDiffTimeToSeconds $ sum (fmap time xs)))) >> lnbk
---     hline
---     "Total" & "" & "" & "" & texy (sum (fmap time xs)) >> lnbk
---     hline
 
 entryToRow :: Info -> Entry -> LaTeXM ()
 entryToRow info Entry {..} = texy serviceName
@@ -182,15 +129,6 @@ entryToRow info Entry {..} = texy serviceName
     & fromString (prettyStringForFractional amount) >> lnbk
         where quantity = (/3600) . nominalDiffTimeToSeconds $ time
               amount = realToFrac (payRate info) * quantity
-
--- prettyStringForFractional x
---     | length afterDotWithoutZeros == 0 = beforeDot ++ afterDotWithoutZeros
---     | head afterDotWithoutZeros == '0' = beforeDot ++ afterDotWithoutZeros
---     | otherwise = beforeDot ++ "." ++ afterDotWithoutZeros
---         where beforeDot = take dotIndex (show x)
---               afterDot = drop (dotIndex + 1) (show x)
---               dotIndex = fromJust (List.elemIndex '.' (show x))
---               afterDotWithoutZeros = dropWhile (== '0') (reverse afterDot)
 
 -- this one is actually not only for fractional
 prettyStringForFractional x
