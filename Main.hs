@@ -36,6 +36,7 @@ main = do
                     usepackage [] tabularxp
                     document $ do
                         makeHeader start end
+                        makeSenderBlock info
                         entriesToTable entries info
 
 
@@ -110,6 +111,17 @@ makeHeader start end = do
         "---"
         texy end
         lnbkspc (Ex 2)
+
+makeSenderBlock :: Info -> LaTeXM ()
+makeSenderBlock info = do
+    textbf $ do
+        large $ do
+            texy (senderName info)
+            lnbk
+        texy (senderAddress info)
+        lnbk
+        texy (senderCity info)
+        lnbkspc (Ex 20)
 
 entriesToTable :: [Entry] -> Info -> LaTeXM ()
 entriesToTable xs info = tabularx (CustomMeasure textwidth) Nothing [NameColumn "X", CenterColumn, NameColumn "X", NameColumn "X", RightColumn] $ do
