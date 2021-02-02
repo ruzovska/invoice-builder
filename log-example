@@ -3,7 +3,7 @@ Log
     , end = (2017-11-29)
     , entries =
         [ Entry
-            { serviceName = "Software development"
+            { serviceName = "Software development2"
             , description = "Planting"
             , tickets =
                 [ PullRequest "githubtraining/hellogitworld" 1
@@ -13,7 +13,57 @@ Log
             , isDone = True
             }
         , Entry
+            { serviceName = "Software development3"
+            , description = "Gathering"
+            , tickets =
+                [ Issue "githubtraining/hellogitworld" 132
+                , Issue "githubtraining/hellogitworld" 140
+                ]
+            , time = 5400s
+            , isDone = True
+            }
+        , Entry
             { serviceName = "Software development"
+            , description = "Gathering"
+            , tickets =
+                [ Issue "githubtraining/hellogitworld" 132
+                , Issue "githubtraining/hellogitworld" 140
+                ]
+            , time = 5400s
+            , isDone = True
+            }
+        , Entry
+            { serviceName = "Software development"
+            , description = "Gathering"
+            , tickets =
+                [ Issue "githubtraining/hellogitworld" 132
+                , Issue "githubtraining/hellogitworld" 140
+                ]
+            , time = 5400s
+            , isDone = True
+            }
+        , Entry
+            { serviceName = "Software development"
+            , description = "Gathering"
+            , tickets =
+                [ Issue "githubtraining/hellogitworld" 132
+                , Issue "githubtraining/hellogitworld" 140
+                ]
+            , time = 5400s
+            , isDone = True
+            }
+        , Entry
+            { serviceName = "Software development2"
+            , description = "Gathering"
+            , tickets =
+                [ Issue "githubtraining/hellogitworld" 132
+                , Issue "githubtraining/hellogitworld" 140
+                ]
+            , time = 5400s
+            , isDone = True
+            }
+        , Entry
+        { serviceName = "Software development2"
             , description = "Gathering"
             , tickets =
                 [ Issue "githubtraining/hellogitworld" 132
