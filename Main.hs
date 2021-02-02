@@ -118,7 +118,11 @@ entriesToTable xs info = tabularx (CustomMeasure textwidth) Nothing [NameColumn 
     hline
     sequence_ $ fmap (entryToRow info) (superMerge . groupSimilarEntriesSorted $ xs)
     hline
-    "Total" & "" & "" & "" & texy (sum (fmap time xs)) >> lnbk
+    "Total"
+        & ""
+        & ""
+        & ""
+        & fromString (prettyStringForFractional (sum (fmap (\entry -> realToFrac (payRate info) * ((/3600) . nominalDiffTimeToSeconds $ (time entry))) (superMerge . groupSimilarEntriesSorted $ xs)))) >> lnbk
     hline
 
 entryToRow :: Info -> Entry -> LaTeXM ()
