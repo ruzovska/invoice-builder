@@ -24,19 +24,20 @@ main = do
     args <- getArgs
     if length args == 0
         then print "No arguments provided!"
-        else do log <- readFile (args !! 0)
+        else do logString <- readFile (args !! 0)
                 infoString <- readFile (args !! 1)
                 let timesheetFilePath = args !! 2
-                let Log {..} = read log :: Log
+                let Log {..} = read logString :: Log
                 -- let Info {..} = read info :: Info
                 let info = read infoString :: Info
+                let log = read logString :: Log
                 writeFile timesheetFilePath $ Text.unpack $ (render :: LaTeX -> Text) $ execLaTeXM $ do
                     documentclass [] article
                     usepackage ["colorlinks=true"] hyperref
                     usepackage [] tabularxp
                     document $ do
                         noindent
-                        makeInvoiceBlock info
+                        makeInvoiceBlock info log
                         lnbkspc (Ex 3)
                         makeSenderBlock info
                         lnbkspc (Ex 3)
@@ -119,11 +120,12 @@ instance Texy Ticket where
 --         texy end
 --         lnbkspc (Ex 2)
 
-makeInvoiceBlock :: Info -> LaTeXM ()
-makeInvoiceBlock info = do
+makeInvoiceBlock :: Info -> Log -> LaTeXM ()
+makeInvoiceBlock info log = do
     (textbf . small) "INVOICE" >> lnbk >> texy (invoiceNumber info) >> lnbkspc (Ex 2)
     (textbf . small) "DATE" >> lnbk >> texy (invoiceDate info) >> lnbkspc (Ex 2)
-    (textbf . small) "BALANCE DUE" >> lnbk >> "500 usd" >> lnbkspc (Ex 3)
+    (textbf . small) "BALANCE DUE" >> lnbk >> texy (currency info) >> " "
+    fromString (prettyStringForFractional (makeTotalAmount (entries log) info)) >> lnbkspc (Ex 3)
 
 makeSenderBlock :: Info -> LaTeXM ()
 makeSenderBlock info = do
@@ -137,6 +139,9 @@ makeRecipientBlock info = do
     (textbf . large2) (texy (recipientName info)) >> lnbkspc (Ex 1)
     texy (recipientAddress info) >> lnbk
     texy (recipientCity info) >> lnbkspc (Ex 3)
+
+-- makeTotalAmount :: Log -> Info -> Double
+makeTotalAmount entries info = sum (fmap (\entry -> realToFrac (payRate info) * ((/3600) . nominalDiffTimeToSeconds $ (time entry))) (superMerge . groupSimilarEntriesSorted $ entries))
 
 entriesToTable :: [Entry] -> Info -> LaTeXM ()
 entriesToTable xs info = tabularx (CustomMeasure textwidth) Nothing [NameColumn "X", CenterColumn, NameColumn "X", NameColumn "X", RightColumn] $ do
@@ -153,7 +158,7 @@ entriesToTable xs info = tabularx (CustomMeasure textwidth) Nothing [NameColumn 
         & do
               texy (currency info)
               " "
-              fromString (prettyStringForFractional (sum (fmap (\entry -> realToFrac (payRate info) * ((/3600) . nominalDiffTimeToSeconds $ (time entry))) (superMerge . groupSimilarEntriesSorted $ xs)))) >> lnbkspc (Ex 1)
+              fromString (prettyStringForFractional (makeTotalAmount xs info)) >> lnbkspc (Ex 1)
     hline
 
 entryToRow :: Info -> Entry -> LaTeXM ()
