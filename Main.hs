@@ -158,7 +158,7 @@ entriesToTable xs info = tabularx (CustomMeasure textwidth) Nothing [NameColumn 
         & do
               texy (currency info)
               " "
-              fromString (prettyStringForFractional (makeTotalAmount xs info)) >> lnbkspc (Ex 1)
+              fromString (prettyStringForFractional (makeTotalAmount xs info)) >> lnbkspc (Ex 2)
     hline
 
 entryToRow :: Info -> Entry -> LaTeXM ()
