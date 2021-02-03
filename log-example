@@ -23,7 +23,7 @@ Log
             , isDone = True
             }
         , Entry
-            { serviceName = "Software development"
+            { serviceName = "Soft"
             , description = "Gathering"
             , tickets =
                 [ Issue "githubtraining/hellogitworld" 132

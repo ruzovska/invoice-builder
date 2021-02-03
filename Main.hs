@@ -35,8 +35,13 @@ main = do
                     usepackage ["colorlinks=true"] hyperref
                     usepackage [] tabularxp
                     document $ do
-                        makeHeader start end
+                        noindent
+                        makeInvoiceBlock info
+                        lnbkspc (Ex 3)
                         makeSenderBlock info
+                        lnbkspc (Ex 3)
+                        makeRecipientBlock info
+                        lnbkspc (Ex 3)
                         entriesToTable entries info
 
 
@@ -92,7 +97,8 @@ data Info = Info
     , recipientAddress :: Text
     , recipientCity :: Text
     , payRate :: Double
-    , date :: Day
+    , invoiceDate :: Day
+    , invoiceNumber :: Text
     } deriving (Show, Read)
 
 data Ticket = Issue String Int | PullRequest String Int deriving (Show, Read)
@@ -103,38 +109,47 @@ instance Texy Ticket where
     texy (PullRequest repository n) =
         href [] (createURL ("https://github.com/" <> repository <> "/pull/" <> show n)) ("#" <> texy n)
 
-makeHeader :: Day -> Day -> LaTeXM ()
-makeHeader start end = do
-    textbf $ do
-        "Invoice for "
-        texy start
-        "---"
-        texy end
-        lnbkspc (Ex 2)
+-- makeHeader :: Day -> Day -> LaTeXM ()
+-- makeHeader start end = do
+--     textbf $ do
+--         "Invoice for "
+--         texy start
+--         "---"
+--         texy end
+--         lnbkspc (Ex 2)
+
+makeInvoiceBlock :: Info -> LaTeXM ()
+makeInvoiceBlock info = do
+    (textbf . small) "INVOICE" >> lnbk >> texy (invoiceNumber info) >> lnbkspc (Ex 2)
+    (textbf . small) "DATE" >> lnbk >> texy (invoiceDate info) >> lnbkspc (Ex 2)
+    (textbf . small) "BALANCE DUE" >> lnbk >> "500 usd" >> lnbkspc (Ex 3)
 
 makeSenderBlock :: Info -> LaTeXM ()
 makeSenderBlock info = do
-    textbf $ do
-        large $ do
-            texy (senderName info)
-            lnbk
-        texy (senderAddress info)
-        lnbk
-        texy (senderCity info)
-        lnbkspc (Ex 20)
+    textbf . large3 $ texy (senderName info) >> lnbkspc (Ex 1)
+    texy (senderAddress info) >> lnbk
+    texy (senderCity info) >> lnbkspc (Ex 3)
+
+makeRecipientBlock :: Info -> LaTeXM ()
+makeRecipientBlock info = do
+    (textbf . small) "BILL TO" >> lnbkspc (Ex 2)
+    (textbf . large2) (texy (recipientName info)) >> lnbkspc (Ex 1)
+    texy (recipientAddress info) >> lnbk
+    texy (recipientCity info) >> lnbkspc (Ex 3)
 
 entriesToTable :: [Entry] -> Info -> LaTeXM ()
 entriesToTable xs info = tabularx (CustomMeasure textwidth) Nothing [NameColumn "X", CenterColumn, NameColumn "X", NameColumn "X", RightColumn] $ do
-    hline
-    "Service" & "Rate" & "Quantity" & "" & "Amount" >> lnbk
-    hline
+    hline >> lnbk
+    (textbf . small) "SERVICE" & (textbf . small) "RATE" & (textbf . small) "QUANTITY" & "" & (textbf . small) "AMOUNT" >> lnbkspc (Ex 2)
+    hline >> lnbk
     sequence_ $ fmap (entryToRow info) (superMerge . groupSimilarEntriesSorted $ xs)
-    hline
-    "Total"
+    lnbk
+    hline >> lnbk
+    (textbf . small) "TOTAL"
         & ""
         & ""
         & ""
-        & fromString (prettyStringForFractional (sum (fmap (\entry -> realToFrac (payRate info) * ((/3600) . nominalDiffTimeToSeconds $ (time entry))) (superMerge . groupSimilarEntriesSorted $ xs)))) >> lnbk
+        & fromString (prettyStringForFractional (sum (fmap (\entry -> realToFrac (payRate info) * ((/3600) . nominalDiffTimeToSeconds $ (time entry))) (superMerge . groupSimilarEntriesSorted $ xs)))) >> lnbkspc (Ex 1)
     hline
 
 entryToRow :: Info -> Entry -> LaTeXM ()
@@ -142,7 +157,7 @@ entryToRow info Entry {..} = texy serviceName
     & fromString (prettyStringForFractional (payRate info))
     & fromString (prettyStringForFractional quantity)
     & ""
-    & fromString (prettyStringForFractional amount) >> lnbk
+    & fromString (prettyStringForFractional amount) >> lnbkspc (Ex 3)
         where quantity = (/3600) . nominalDiffTimeToSeconds $ time
               amount = realToFrac (payRate info) * quantity
 
