@@ -97,6 +97,7 @@ data Info = Info
     , recipientAddress :: Text
     , recipientCity :: Text
     , payRate :: Double
+    , currency :: Text
     , invoiceDate :: Day
     , invoiceNumber :: Text
     } deriving (Show, Read)
@@ -149,7 +150,10 @@ entriesToTable xs info = tabularx (CustomMeasure textwidth) Nothing [NameColumn 
         & ""
         & ""
         & ""
-        & fromString (prettyStringForFractional (sum (fmap (\entry -> realToFrac (payRate info) * ((/3600) . nominalDiffTimeToSeconds $ (time entry))) (superMerge . groupSimilarEntriesSorted $ xs)))) >> lnbkspc (Ex 1)
+        & do
+              texy (currency info)
+              " "
+              fromString (prettyStringForFractional (sum (fmap (\entry -> realToFrac (payRate info) * ((/3600) . nominalDiffTimeToSeconds $ (time entry))) (superMerge . groupSimilarEntriesSorted $ xs)))) >> lnbkspc (Ex 1)
     hline
 
 entryToRow :: Info -> Entry -> LaTeXM ()
@@ -157,7 +161,7 @@ entryToRow info Entry {..} = texy serviceName
     & fromString (prettyStringForFractional (payRate info))
     & fromString (prettyStringForFractional quantity)
     & ""
-    & fromString (prettyStringForFractional amount) >> lnbkspc (Ex 3)
+    & do texy (currency info) >> " " >> fromString (prettyStringForFractional amount) >> lnbkspc (Ex 3)
         where quantity = (/3600) . nominalDiffTimeToSeconds $ time
               amount = realToFrac (payRate info) * quantity
 

@@ -6,6 +6,7 @@ Info
     , recipientAddress = "Street"
     , recipientCity = "City"
     , payRate = 10
+    , currency = "USD"
     , invoiceDate = (2021-02-01)
     , invoiceNumber = "A0001"
     }
