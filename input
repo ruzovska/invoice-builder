@@ -1,0 +1,105 @@
+[
+    Period
+        { start = (2021-02-01)
+        , end = (2021-03-31)
+        , tasks =
+            [ Task
+                { description = "Planting"
+                , tickets =
+                    [ PullRequest "githubtraining/hellogitworld" 1
+                    , PullRequest "githubtraining/hellogitworld" 2
+                    ]
+                , time = 36000s
+                , isDone = True
+                }
+            , Task
+                { description = "Gathering"
+                , tickets =
+                    [ Issue "githubtraining/hellogitworld" 132
+                    , Issue "githubtraining/hellogitworld" 140
+                    ]
+                , time = 72000s
+                , isDone = True
+                }
+            ]
+        , services =
+            [ Service
+                { weight = 20
+                , name = "Software development services"
+                , price = 10
+                }
+            , Service
+                { weight = 10
+                , name = "Additional software development services"
+                , price = 0
+                }
+            ]
+        }
+,   Period
+        { start = (2021-04-01)
+        , end = (2021-04-30)
+        , tasks =
+            [ Task
+                { description = "Planting in April"
+                , tickets =
+                    [ PullRequest "githubtraining/hellogitworld" 1
+                    , PullRequest "githubtraining/hellogitworld" 2
+                    ]
+                , time = 54000s
+                , isDone = True
+                }
+            , Task
+                { description = "Gathering in April"
+                , tickets =
+                    [ Issue "githubtraining/hellogitworld" 132
+                    , Issue "githubtraining/hellogitworld" 140
+                    ]
+                , time = 21600s
+                , isDone = True
+                }
+            ]
+        , services =
+            [ Service
+                { weight = 20
+                , name = "Software development services"
+                , price = 10
+                }
+            , Service
+                { weight = 1
+                , name = "Additional software development services"
+                , price = 0
+                }
+            ]
+        }
+,   Period
+        { start = (2021-05-01)
+        , end = (2021-05-31)
+        , tasks =
+            [ Task
+                { description = "Planting in May"
+                , tickets =
+                    [ PullRequest "githubtraining/hellogitworld" 1
+                    , PullRequest "githubtraining/hellogitworld" 2
+                    ]
+                , time = 36000s
+                , isDone = True
+                }
+            , Task
+                { description = "Gathering in May"
+                , tickets =
+                    [ Issue "githubtraining/hellogitworld" 132
+                    , Issue "githubtraining/hellogitworld" 140
+                    ]
+                , time = 36000s
+                , isDone = True
+                }
+            ]
+        , services =
+            [ Service
+                { weight = 20
+                , name = "Software development services"
+                , price = 10
+                }
+            ]
+        }
+]
